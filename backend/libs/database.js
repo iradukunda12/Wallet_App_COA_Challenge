@@ -12,4 +12,13 @@ const pool = new Pool({
   },
 });
 
+// Test the connection
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error("Error acquiring client:", err.stack);
+  }
+  console.log("Database connection successful");
+  release();
+});
+
 export default pool;
