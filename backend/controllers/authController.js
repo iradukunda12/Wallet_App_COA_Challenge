@@ -1,6 +1,52 @@
 import pool from "../libs/database.js";
 import { comparePassword, createJWT, hashPassword } from "../libs/index.js";
 
+const onSubmit = async (data) => {
+  try {
+    setLoading(true);
+
+    // Detailed logging of data being sent
+    console.log(
+      "Submitting data (stringified):",
+      JSON.stringify(data, null, 2)
+    );
+
+    // Ensure all required fields are present
+    if (!data.firstname || !data.email || !data.password) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    const { data: res } = await api.post("/auth/sign-up", data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (res?.user) {
+      toast.success("Account created successfully. You can now login");
+      console.log("Response from server:", res);
+
+      setTimeout(() => {
+        navigate("sign-in");
+      }, 1500);
+    }
+  } catch (error) {
+    // Even more detailed error logging
+    console.error("Full error object:", error);
+    console.error("Error response data:", error.response?.data);
+    console.error("Error response status:", error.response?.status);
+    console.error("Error message:", error.message);
+
+    toast.error(
+      error?.response?.data?.message ||
+        "An error occurred. Please check your input and try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 export const signupUser = async (req, res) => {
   try {
     const { firstname, email, password } = req.body;
